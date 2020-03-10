@@ -70,6 +70,15 @@ public class Main {
     }
 
     private File getFileFromResources(String fileName) {
+        ClassLoader classLoader = Main.class.getClassLoader();
+
+        try {
+            Class aClass = classLoader.loadClass(fileName);
+            System.out.println("aClass.getName() = " + aClass.getName());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         File file = new File(fileName);
 
         if (file == null) {
@@ -86,7 +95,7 @@ public class Main {
         try {
 
             File afile = new File("C:\\Users\\fsobrado\\Documents\\NetBeansProjects\\CodeClonesTestProject\\src\\main\\java\\" + fileNameA);
-            File bfile = new File("C:\\Users\\fsobrado\\Documents\\NetBeansProjects\\SearchFolder\\" + fileNameB);
+            File bfile = new File("C:\\Users\\fsobrado\\Documents\\NetBeansProjects\\SearchFolder\\project\\" + fileNameB);
 
             inStream = new FileInputStream(afile);
             outStream = new FileOutputStream(bfile);
