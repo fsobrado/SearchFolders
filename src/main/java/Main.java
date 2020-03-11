@@ -1,19 +1,15 @@
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.swing.JOptionPane;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -26,14 +22,15 @@ import javax.swing.JOptionPane;
  */
 public class Main {
 
-    static ArrayList<String> files = new ArrayList();
+    static ArrayList<ClassInfo> classList = new ArrayList<>();
+    static ArrayList<String> files = new ArrayList<>();
+    private final String REG_EXP_METHOD = "\\s(public|protected|private|static|\\s) +[\\w\\<\\>\\[\\],\\s]+\\s+(\\w+) *\\([^\\)]*\\) *(\\{?|[^;])";
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        displayIt(new File("C:\\Users\\fsobrado\\Documents\\NetBeansProjects\\CodeClonesTestProject\\src\\main\\java"));
-        System.out.println(files);
+        loadFiles(new File("C:\\Users\\fsobrado\\Documents\\NetBeansProjects\\CodeClonesTestProject\\src\\main\\java"));
         Main obj = new Main();
         obj.getJavaClass(files);
     }
@@ -42,7 +39,7 @@ public class Main {
         getJavaClass(files);
     }
 
-    public static void displayIt(File node) {
+    public static void loadFiles(File node) {
         System.out.println(node.getAbsoluteFile());
         Main obj = new Main();
 
@@ -53,39 +50,68 @@ public class Main {
                     files.add(filename);
                     obj.copy(node.getName() + "/" + filename, filename);
                 }
-                displayIt(new File(node, filename));
+                loadFiles(new File(node, filename));
             }
         }
 
     }
 
     public void getJavaClass(ArrayList<String> files) {
-        ArrayList<Class> javaClass = new ArrayList();
-
         for (int i = 0; i < files.size(); i++) {
             String url = files.get(i);
-            javaClass.add(getFileFromResources(url).getClass());
+            classList.add(getFileFromResources("project\\" + url));
         }
-        System.out.println(javaClass);
+        System.out.println(classList);
     }
 
-    private File getFileFromResources(String fileName) {
-        ClassLoader classLoader = Main.class.getClassLoader();
-
-        try {
-            Class aClass = classLoader.loadClass(fileName);
-            System.out.println("aClass.getName() = " + aClass.getName());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        File file = new File(fileName);
-
+    private ClassInfo getFileFromResources(String fileName) {
+        File file = null;
+        ClassInfo classInfo = new ClassInfo();
+        
+        file = new File(fileName);
         if (file == null) {
             throw new IllegalArgumentException("file is not found!");
-        } else {
-            return (file);
         }
+
+        Scanner sc;
+        try {
+            sc = new Scanner(file);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+        
+        classInfo.setName(fileName);
+        
+        boolean insideMethod = false;
+        ArrayList<MethodInfo> methodList = new ArrayList<>();
+        StringBuilder content = new StringBuilder();
+        String methodName = "";
+        classInfo.setMethodList(methodList);
+        
+        while (sc.hasNextLine()) {
+            String nextLine = sc.nextLine();
+            if (nextLine.matches(REG_EXP_METHOD)) {
+                insideMethod = true;
+                methodName = nextLine;
+                MethodInfo methodInfo = new MethodInfo();
+                methodInfo.setMethodName(methodName);
+                methodList.add(methodInfo);
+                content = new StringBuilder();
+                continue;
+            }
+
+            if (insideMethod) {
+                content.append(nextLine);
+                for (MethodInfo method : methodList) {
+                    if (method.getMethodName().equals(methodName)) {
+                        method.setContent(content.toString());
+                    }
+                }
+            }
+        }
+
+        return classInfo;
     }
 
     public void copy(String fileNameA, String fileNameB) {
