@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -33,6 +35,36 @@ public class Main {
         loadFiles(new File("C:\\Users\\fsobrado\\Documents\\NetBeansProjects\\CodeClonesTestProject\\src\\main\\java"));
         Main obj = new Main();
         obj.getJavaClass(files);
+    }
+
+    private void usingClassLoader() {
+        Main obj = new Main();
+        ArrayList<File> javaClass = obj.getJavaClassClassLoader(files);
+        try {
+            //COMPILE CLASSES
+            for (File file : javaClass) {
+                JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+                int result = compiler.run(null, null, null, file.getAbsolutePath());
+                System.out.println("result " + result);
+            }
+            javaClass = obj.getJavaClassClassLoader(files);
+            String folder = "";
+            for (File file : javaClass) {
+                folder = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("\\"));
+                if (!folder.equals("")) {
+                    break;
+                }
+            }
+            ClassLoaderGlen classLoaderGlen = new ClassLoaderGlen();
+            try {
+                ArrayList<Class> javaClasses = classLoaderGlen.load();
+                System.out.println(javaClasses);
+            } catch (Exception ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void code() {
@@ -63,11 +95,21 @@ public class Main {
         }
         System.out.println(classList);
     }
-
+    
+    public ArrayList<File> getJavaClassClassLoader(ArrayList<String> files) {
+        ArrayList<File> javaClass = new ArrayList();
+        for (int i = 0; i < files.size(); i++) {
+            String url = files.get(i);
+            javaClass.add(getFileFromResourcesUsingClassLoader("project\\" + url));
+        }
+        System.out.println(javaClass);
+        return javaClass;
+    }
+    
     private ClassInfo getFileFromResources(String fileName) {
         File file = null;
         ClassInfo classInfo = new ClassInfo();
-        
+
         file = new File(fileName);
         if (file == null) {
             throw new IllegalArgumentException("file is not found!");
@@ -80,15 +122,15 @@ public class Main {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
-        
+
         classInfo.setName(fileName);
-        
+
         boolean insideMethod = false;
         ArrayList<MethodInfo> methodList = new ArrayList<>();
         StringBuilder content = new StringBuilder();
         String methodName = "";
         classInfo.setMethodList(methodList);
-        
+
         while (sc.hasNextLine()) {
             String nextLine = sc.nextLine();
             if (nextLine.matches(REG_EXP_METHOD)) {
@@ -113,7 +155,23 @@ public class Main {
 
         return classInfo;
     }
-
+    
+    private File getFileFromResourcesUsingClassLoader(String fileName) {
+        /*ClassLoader classLoader = Main.class.getClassLoader();
+        try {
+            Class aClass = classLoader.loadClass(fileName);
+            System.out.println("aClass.getName() = " + aClass.getName());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }*/
+        File file = new File(fileName);
+        if (file == null) {
+            throw new IllegalArgumentException("file is not found!");
+        } else {
+            return (file);
+        }
+    }
+    
     public void copy(String fileNameA, String fileNameB) {
         InputStream inStream = null;
         OutputStream outStream = null;
