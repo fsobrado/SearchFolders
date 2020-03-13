@@ -16,7 +16,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        List<ClassInfo> loadClasses = CustomProjectClassParser.loadClasses("C:\\Users\\Fede\\Documents\\NetBeansProjects\\Clones_TestProject\\");
+        List<ClassInfo> loadClasses = CustomProjectClassParser.loadClasses("C:\\Users\\Fede\\Documents\\NetBeansProjects\\Clones_TestProject\\src\\");
 
         for (ClassInfo classInfo : loadClasses) {
             System.out.println(classInfo.getName());

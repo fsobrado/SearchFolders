@@ -93,7 +93,7 @@ public class CustomProjectClassParser {
             for (String filename : subNode) {
                 if (filename.contains(".java")) {
                     classList.add(filename);
-                    copy(projectUrl, node.getName() + "\\" + filename, filename);
+                    copy(node.getPath(), filename);
                 }
                 loadFiles(projectUrl, new File(node,filename));
             }
@@ -101,14 +101,14 @@ public class CustomProjectClassParser {
 
     }
 
-    private static void copy(String projectUrl, String fileNameA, String fileNameB) {
+    private static void copy(String projectUrl, String fileName) {
         InputStream inStream = null;
         OutputStream outStream = null;
 
         try {
 
-            File fromFile = new File(projectUrl + fileNameA);
-            File toFile = new File(PROJECT_DEFAULT_FOLDER + fileNameB);
+            File fromFile = new File(projectUrl,fileName);
+            File toFile = new File(PROJECT_DEFAULT_FOLDER + fileName);
 
             inStream = new FileInputStream(fromFile);
             outStream = new FileOutputStream(toFile);
@@ -128,7 +128,7 @@ public class CustomProjectClassParser {
 
             //delete the original file
             //afile.delete();
-            System.out.println("File is copied successful!");
+            System.out.println("File copied successfully!");
 
         } catch (IOException e) {
              Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
