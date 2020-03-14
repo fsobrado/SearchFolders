@@ -64,6 +64,10 @@ public class CustomProjectClassParser {
             
             while (sc.hasNextLine()) {
                 String nextLine = sc.nextLine();
+                //Ignore comments lines
+                if (nextLine.trim().matches(RegExpEnum.COMMENTS.getType())) {
+                    continue;
+                }
                 if(openKey==closeKey){
                     insideMethod = false;
                 }

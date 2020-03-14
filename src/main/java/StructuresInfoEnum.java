@@ -13,7 +13,8 @@ public enum StructuresInfoEnum {
      * METHOD DETECTION
      */
     OPEN_STRUC("{"),
-    CLOSE_STRUC("}");
+    CLOSE_STRUC("}"),
+    COMMNET("");
 
     private String m_type;
 

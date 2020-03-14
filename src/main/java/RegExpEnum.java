@@ -12,7 +12,8 @@ public enum RegExpEnum {
     /**
      * METHOD DETECTION
      */
-    REG_EXP_METHOD("(public|protected|private|static|\\s) +[\\w\\<\\>\\[\\],\\s]+\\s+(\\w+) *\\([^\\)]*\\) *(\\{?|[^;])");
+    REG_EXP_METHOD("(public|protected|private|static|\\s) +[\\w\\<\\>\\[\\],\\s]+\\s+(\\w+) *\\([^\\)]*\\) *(\\{?|[^;])"),
+    COMMENTS("//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/");
 
     private String m_type;
 
