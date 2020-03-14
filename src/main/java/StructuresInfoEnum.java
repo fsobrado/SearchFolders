@@ -8,15 +8,16 @@
  *
  * @author Fede
  */
-public enum RegExpEnum {
+public enum StructuresInfoEnum {
     /**
      * METHOD DETECTION
      */
-    REG_EXP_METHOD("(public|protected|private|static|\\s) +[\\w\\<\\>\\[\\],\\s]+\\s+(\\w+) *\\([^\\)]*\\) *(\\{?|[^;])");
+    OPEN_STRUC("{"),
+    CLOSE_STRUC("}");
 
     private String m_type;
 
-    RegExpEnum(String p_type) {
+    StructuresInfoEnum(String p_type) {
         setType(p_type);
     }
 
@@ -27,5 +28,4 @@ public enum RegExpEnum {
     private void setType(String p_type) {
         this.m_type = p_type;
     }
-
 }

@@ -59,10 +59,17 @@ public class CustomProjectClassParser {
             StringBuilder content = new StringBuilder();
             String methodName = "";
             classInfo.setMethodList(methodList);
-
+            int openKey = 0;
+            int closeKey = 0;
+            
             while (sc.hasNextLine()) {
                 String nextLine = sc.nextLine();
-                if (nextLine.matches(RegExpEnum.REG_EXP_METHOD.getType())) {
+                if(openKey==closeKey){
+                    insideMethod = false;
+                }
+                
+                if (nextLine.trim().matches(RegExpEnum.REG_EXP_METHOD.getType())) {
+                    openKey++;
                     insideMethod = true;
                     methodName = nextLine;
                     MethodInfo methodInfo = new MethodInfo();
@@ -74,6 +81,13 @@ public class CustomProjectClassParser {
 
                 if (insideMethod) {
                     content.append(nextLine);
+                    if(content.toString().contains(StructuresInfoEnum.OPEN_STRUC.getType())){
+                        openKey++;
+                    }
+                    if(content.toString().contains(StructuresInfoEnum.CLOSE_STRUC.getType())){
+                        closeKey++;
+                    }
+                    
                     for (MethodInfo method : methodList) {
                         if (method.getMethodName().equals(methodName)) {
                             method.setContent(content.toString());
