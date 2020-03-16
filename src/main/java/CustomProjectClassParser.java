@@ -27,10 +27,21 @@ public class CustomProjectClassParser {
 
     private static ArrayList<String> classList = new ArrayList<>();
     private static final String PROJECT_DEFAULT_FOLDER = ".\\project\\";
-    private static final List<String> IGNORE_FOLDERS_LIST = Arrays.asList(".git","target");
-    
+    private static final List<String> IGNORE_FOLDERS_LIST = Arrays.asList(".git", "target");
+
     public static List<ClassInfo> loadClasses(String projectUrl) {
-        loadFiles(projectUrl, new File(projectUrl));
+        //Check default file locations
+        File projectFile = new File(projectUrl);
+        if (!projectFile.exists()) {
+            try {
+                projectFile.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(CustomProjectClassParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        new File(PROJECT_DEFAULT_FOLDER).mkdirs();
+        //
+        loadFiles(projectUrl, projectFile);
 
         if (classList.isEmpty()) {
             return Collections.EMPTY_LIST;
@@ -38,7 +49,7 @@ public class CustomProjectClassParser {
         List<ClassInfo> classInfoList = new ArrayList<>();
         for (String fileName : classList) {
             ClassInfo classInfo = new ClassInfo();
-            File file = new File(PROJECT_DEFAULT_FOLDER+fileName);
+            File file = new File(PROJECT_DEFAULT_FOLDER + fileName);
 
             if (file == null) {
                 throw new IllegalArgumentException("file is not found!");
@@ -61,17 +72,17 @@ public class CustomProjectClassParser {
             classInfo.setMethodList(methodList);
             int openKey = 0;
             int closeKey = 0;
-            
+
             while (sc.hasNextLine()) {
                 String nextLine = sc.nextLine();
                 //Ignore comments lines
                 if (nextLine.trim().matches(RegExpEnum.COMMENTS.getType())) {
                     continue;
                 }
-                if(openKey==closeKey){
+                if (openKey == closeKey) {
                     insideMethod = false;
                 }
-                
+
                 if (nextLine.trim().matches(RegExpEnum.REG_EXP_METHOD.getType())) {
                     openKey++;
                     insideMethod = true;
@@ -85,13 +96,13 @@ public class CustomProjectClassParser {
 
                 if (insideMethod) {
                     content.append(nextLine);
-                    if(content.toString().contains(StructuresInfoEnum.OPEN_STRUC.getType())){
+                    if (content.toString().contains(StructuresInfoEnum.OPEN_STRUC.getType())) {
                         openKey++;
                     }
-                    if(content.toString().contains(StructuresInfoEnum.CLOSE_STRUC.getType())){
+                    if (content.toString().contains(StructuresInfoEnum.CLOSE_STRUC.getType())) {
                         closeKey++;
                     }
-                    
+
                     for (MethodInfo method : methodList) {
                         if (method.getMethodName().equals(methodName)) {
                             method.setContent(content.toString());
@@ -113,7 +124,7 @@ public class CustomProjectClassParser {
                     classList.add(filename);
                     copy(node.getPath(), filename);
                 }
-                loadFiles(projectUrl, new File(node,filename));
+                loadFiles(projectUrl, new File(node, filename));
             }
         }
 
@@ -125,7 +136,7 @@ public class CustomProjectClassParser {
 
         try {
 
-            File fromFile = new File(projectUrl,fileName);
+            File fromFile = new File(projectUrl, fileName);
             File toFile = new File(PROJECT_DEFAULT_FOLDER + fileName);
 
             inStream = new FileInputStream(fromFile);
@@ -149,7 +160,7 @@ public class CustomProjectClassParser {
             System.out.println("File copied successfully!");
 
         } catch (IOException e) {
-             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 }
